@@ -1,4 +1,4 @@
-**MakeDEB** - is a wizard for building simple DEB packages from pre-installed files (scripts, etc.).)
+**MakeDEB** - is a wizard for building simple DEB packages from pre-installed files (scripts, etc.)
 
 Dependencies: zenity, dpkg-dev
 
