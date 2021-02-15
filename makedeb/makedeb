@@ -1,0 +1,93 @@
+#!/bin/bash
+
+#Simple DEB-Package Maker
+#Author: Alex Kotov aka alex_q_2000 (C) 2021
+#License: GPLv3
+#Requires: zenity dpkg-dev
+
+#Нужные для пакета файлы УЖЕ должны находиться в рабочих
+#папках системы (/usr/bin /ush/local/share /usr/lib и т.п.)
+#На первом шаге эти файлы выбираются через диалоговое окно.
+#Если выбор файлов окончен, нажмите кнопку "Отмена".
+
+#Далее вводится обязательная информация для создания пакета.
+
+#Если пакет создаётся повторно и изменяется лишь содержимое
+#самих файлов, которые собираются в deb-пакет,
+#можно запустить скрипт с параметром: makedeb make
+#чтобы пропустить все шаги ввода введённой ранее информации
+#и выполнить только его финальную пересборку.
+
+#Готовый DEB-пакет создаётся в папке ~/makedeb
+#~/makedeb/files - список файлов, включенных в пакет
+#~/makedeb/tmp/DEBIAN/control - содержит версию/релиз и т.д.
+
+#Language select
+case $LANG in
+     ru_RU.UTF-8)
+          str=('Выберите файлы' 'Сведения о пакете' 'Введите данные' 'Имя' 'Версия' 'Архитектура' \
+          'Майнтейнер' 'Описание' 'Зависимости' 'Пакет создан:' 'Ошибка! Пакет не создан!')
+          ;;
+     *)
+          str=('Select files' 'Package information' 'Enter your data' 'Name' 'Version' 'Architecture' \
+          'Maintainer' 'Description' 'Depends' 'Package created:' 'Error! The package is not created!')
+          ;;
+esac
+
+if [ "$1" != "make" ]; then
+#Создаём рабочие каталоги и чистый файл списка файлов пакета
+rm -rf ~/makedeb/tmp; mkdir -p ~/makedeb/tmp/DEBIAN; > ~/makedeb/files
+
+#Собрать нужные файлы и сохранить в список ~/makedeb/files; Отмена = break
+while true; do
+f=$(zenity --file-selection --title="${str[0]}" --multiple --separator="\n")
+    if [ "$?" -eq "0" ]; then
+    echo -e "$f" >> ~/makedeb/files
+        else
+    break
+    fi;
+done
+
+#Ввод сведений о пакете
+p=$(zenity --forms --separator="\n" --title="${str[1]}" \
+    --text="${str[2]}" \
+    --add-entry="${str[3]}" \
+    --add-entry="${str[4]}" \
+    --add-entry="${str[5]}" \
+    --add-entry="${str[6]}" \
+    --add-entry="${str[7]}" \
+    --add-entry="${str[8]}")
+[ "$?" != "0" ] && exit;
+
+#Создаём ~/makedeb/tmp/DEBIAN/control
+echo -e "$p" > ~/makedeb/tmp/DEBIAN/control
+echo -e "\
+Package: $(awk '(NR==1)' ~/makedeb/tmp/DEBIAN/control)\n\
+Version: $(awk '(NR==2)' ~/makedeb/tmp/DEBIAN/control)\n\
+Architecture: $(awk '(NR==3)' ~/makedeb/tmp/DEBIAN/control)\n\
+Maintainer: $(awk '(NR==4)' ~/makedeb/tmp/DEBIAN/control)\n\
+Description: $(awk '(NR==5)' ~/makedeb/tmp/DEBIAN/control)\n\
+Depends: $(awk '(NR==6)' ~/makedeb/tmp/DEBIAN/control)\n\
+Priority: extra\n\
+Section: misc"\
+> ~/makedeb/tmp/DEBIAN/control
+fi;
+
+#Создаём архив ~/makedeb/data.tar.gz с полными путями (ШАГ с параметром "make")
+echo "Make ~/makedeb/data.tar.gz"
+rm -f ~/makedeb/data.tar.gz
+tar -cvzf ~/makedeb/data.tar.gz -T ~/makedeb/files
+#Распаковываем и создаём структуру каталогов
+rm -rf ~/makedeb/tmp/*[^DEBIAN]
+tar -xvzf ~/makedeb/data.tar.gz -C ~/makedeb/tmp
+
+#Создаём пакет DEB
+name="$(grep "Package:" ~/makedeb/tmp/DEBIAN/control | awk '{print $2}')_\
+$(grep "Version:" ~/makedeb/tmp/DEBIAN/control | awk '{print $2}')_\
+$(grep "Architecture:" ~/makedeb/tmp/DEBIAN/control | awk '{print $2}')"
+
+dpkg-deb -b ~/makedeb/tmp ~/makedeb \
+&& zenity --info --no-wrap --text "${str[9]} ~/makedeb/$name.deb" || \
+zenity --error --no-wrap --text "${str[10]}"
+
+exit;

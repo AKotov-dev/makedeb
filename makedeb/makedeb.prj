@@ -1,0 +1,100 @@
+[NAME]
+name=makedeb
+
+[VERSION]
+version=1.0
+
+[RELEASE]
+release=3.mrx8
+
+[GROUP]
+group=Applications/File
+
+[DESCRIPTION]
+0=Simple deb-package wizard
+1=...
+2=More information: /usr/share/doc/package_name/repack.txt
+
+[MAINTAINER]
+maintainer=Alex Kotov
+
+[VENDOR]
+vendor=alex_q_2000 (C) 2021
+
+[SUMMARY]
+summary=Simple deb-package wizard
+
+[URLCOPY]
+urlcopy=https://cloud.mail.ru/public/YTYE/Su5NT93oM
+
+[LICENSE]
+license=GPLv3
+
+[DEPS]
+deps=zenity dpkg-dev
+
+[META]
+meta=0
+
+[NOARCH]
+noarch=1
+
+[SIGN]
+sign=0
+
+[FILES]
+0=/usr/bin/makedeb
+1=/usr/share/applications/makedeb.desktop
+2=/usr/share/doc/makedeb/
+3=/usr/share/icons/makedeb.png
+
+[AFTERINSTALL]
+0=#ldconfig
+1=#update-desktop-database -q /usr/share/applications
+2=#update-mime-database /usr/share/mime
+3=#gtk-update-icon-cache -q -f /usr/share/icons/hicolor
+
+[AFTERREMOVE]
+0=#ldconfig
+1=#update-desktop-database -q /usr/share/applications
+2=#update-mime-database /usr/share/mime
+3=#gtk-update-icon-cache -q -f /usr/share/icons/hicolor
+
+[URL32]
+url32=https://cloud.mail.ru/public/YTYE/Su5NT93oM
+
+[URL64]
+url64=
+
+[PROGRAMNAME]
+programname=MakeDEB
+
+[DEVTOOL]
+devtool=Shell
+
+[TOOLVERSION]
+toolversion=unknown
+
+[INFO]
+0=#Simple DEB-Package Maker
+1=#Author: Alex Kotov aka alex_q_2000 (C) 2021
+2=#License: GPLv3
+3=#Requires: zenity dpkg-dev
+4=
+5=#Нужные для пакета файлы УЖЕ должны находится в рабочих
+6=#папках системы (/usr/bin /ush/local/share /usr/lib и т.п.)
+7=#На первом шаге эти файлы выбираются через диалоговое окно.
+8=#Если выбор файлов окончен, нажмите кнопку "Отмена".
+9=
+10=#Далее вводится обязательная информация для создания пакета.
+11=
+12=#Если пакет создаётся повторно и изменяется лишь содержимое
+13=#самих файлов, которые собираются в deb-пакет,
+14=#можно запустить скрипт с параметром: makedeb make
+15=#чтобы пропустить все шаги ввода введённой ранее информации
+16=#и выполнить только его финальную пересборку.
+17=
+18=#Готовый DEB-пакет создаётся в папке ~/makedeb
+19=
+20=v1.0-2
+21=+очистка ~/makedeb/tmp для makedeb make:  rm -rf ~/makedeb/tmp/*[^DEBIAN]
