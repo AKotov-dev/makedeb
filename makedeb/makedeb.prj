@@ -5,7 +5,7 @@ name=makedeb
 version=1.0
 
 [RELEASE]
-release=3.mrx8
+release=4.mrx8
 
 [GROUP]
 group=Applications/File
@@ -41,6 +41,9 @@ noarch=1
 
 [SIGN]
 sign=0
+
+[DEB]
+deb=1
 
 [FILES]
 0=/usr/bin/makedeb
@@ -96,5 +99,8 @@ toolversion=unknown
 17=
 18=#Готовый DEB-пакет создаётся в папке ~/makedeb
 19=
-20=v1.0-2
-21=+очистка ~/makedeb/tmp для makedeb make:  rm -rf ~/makedeb/tmp/*[^DEBIAN]
+20=v.1.0-4
+21=+request to create a new package immediately after launch
+22=
+23=v1.0-2
+24=+очистка ~/makedeb/tmp для makedeb make:  rm -rf ~/makedeb/tmp/*[^DEBIAN]

@@ -25,14 +25,19 @@
 #Language select
 case $LANG in
      ru_RU.UTF-8)
-          str=('Выберите файлы' 'Сведения о пакете' 'Введите данные' 'Имя' 'Версия' 'Архитектура' \
-          'Майнтейнер' 'Описание' 'Зависимости' 'Пакет создан:' 'Ошибка! Пакет не создан!')
+          str=('Создать новый пакет?' 'Выберите файлы' 'Сведения о пакете' 'Введите данные' \
+          'Имя' 'Версия' 'Архитектура' 'Майнтейнер' 'Описание' 'Зависимости' 'Пакет создан:' \
+          'Ошибка! Пакет не создан!')
           ;;
      *)
-          str=('Select files' 'Package information' 'Enter your data' 'Name' 'Version' 'Architecture' \
-          'Maintainer' 'Description' 'Depends' 'Package created:' 'Error! The package is not created!')
+          str=('Create new package?' 'Select files' 'Package information' 'Enter your data' \
+          'Name' 'Version' 'Architecture' 'Maintainer' 'Description' 'Depends' 'Package created:' \
+          'Error! The package is not created!')
           ;;
 esac
+
+zenity --question --no-wrap --text "${str[0]}"
+[ "$?" != "0" ] && exit
 
 if [ "$1" != "make" ]; then
 #Создаём рабочие каталоги и чистый файл списка файлов пакета
@@ -40,7 +45,7 @@ rm -rf ~/makedeb/tmp; mkdir -p ~/makedeb/tmp/DEBIAN; > ~/makedeb/files
 
 #Собрать нужные файлы и сохранить в список ~/makedeb/files; Отмена = break
 while true; do
-f=$(zenity --file-selection --title="${str[0]}" --multiple --separator="\n")
+f=$(zenity --file-selection --title="${str[1]}" --multiple --separator="\n")
     if [ "$?" -eq "0" ]; then
     echo -e "$f" >> ~/makedeb/files
         else
@@ -49,14 +54,14 @@ f=$(zenity --file-selection --title="${str[0]}" --multiple --separator="\n")
 done
 
 #Ввод сведений о пакете
-p=$(zenity --forms --separator="\n" --title="${str[1]}" \
-    --text="${str[2]}" \
-    --add-entry="${str[3]}" \
+p=$(zenity --forms --separator="\n" --title="${str[2]}" \
+    --text="${str[3]}" \
     --add-entry="${str[4]}" \
     --add-entry="${str[5]}" \
     --add-entry="${str[6]}" \
     --add-entry="${str[7]}" \
-    --add-entry="${str[8]}")
+    --add-entry="${str[8]}" \
+    --add-entry="${str[9]}")
 [ "$?" != "0" ] && exit;
 
 #Создаём ~/makedeb/tmp/DEBIAN/control
@@ -87,7 +92,7 @@ $(grep "Version:" ~/makedeb/tmp/DEBIAN/control | awk '{print $2}')_\
 $(grep "Architecture:" ~/makedeb/tmp/DEBIAN/control | awk '{print $2}')"
 
 dpkg-deb -b ~/makedeb/tmp ~/makedeb \
-&& zenity --info --no-wrap --text "${str[9]} ~/makedeb/$name.deb" || \
-zenity --error --no-wrap --text "${str[10]}"
+&& zenity --info --no-wrap --text "${str[10]} ~/makedeb/$name.deb" || \
+zenity --error --no-wrap --text "${str[11]}"
 
 exit;
